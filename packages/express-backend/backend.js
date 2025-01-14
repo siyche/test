@@ -1,88 +1,55 @@
 import express from 'express';  // Using ES module syntax
 const app = express();
-const port = 8000;
+app.use(express.json()); // Enable parsing of JSON in request body
 
-// In-memory data
 const users = {
-    users_list: [
-      {
-        id: "xyz789",
-        name: "Charlie",
-        job: "Janitor"
-      },
-      {
-        id: "abc123",
-        name: "Mac",
-        job: "Bouncer"
-      },
-      {
-        id: "ppp222",
-        name: "Mac",
-        job: "Professor"
-      },
-      {
-        id: "yat999",
-        name: "Dee",
-        job: "Aspring actress"
-      },
-      {
-        id: "zap555",
-        name: "Dennis",
-        job: "Bartender"
-      },
-      {
-        "id": "qwe123",
-        "job": "Zookeeper",
-        "name": "Cindy"
-      }
-    ]
-  };
-
-// Function to find a user by ID
-const findUserById = (id) => {
-  return users["users_list"].find((user) => user["id"] === id);
+  users_list: [
+    { id: "xyz789", name: "Charlie", job: "Janitor" },
+    { id: "abc123", name: "Mac", job: "Bouncer" },
+    { id: "ppp222", name: "Mac", job: "Professor" },
+    { id: "yat999", name: "Dee", job: "Aspiring actress" },
+    { id: "zap555", name: "Dennis", job: "Bartender" },
+  ]
 };
 
-// Function to add a new user
-const addUser = (user) => {
-  users["users_list"].push(user);  // Add the user to the in-memory list
-  return user;  // Return the added user object
+// Function to find users by name and job
+const findUsersByNameAndJob = (name, job) => {
+  return users["users_list"].filter(
+    (user) =>
+      (name ? user["name"] === name : true) && (job ? user["job"] === job : true)
+  );
 };
 
-// GET /users - Return the list of users
+// Function to delete a user by ID
+const deleteUserById = (id) => {
+  const index = users["users_list"].findIndex((user) => user["id"] === id);
+  if (index !== -1) {
+    users["users_list"].splice(index, 1); // Remove the user from the list
+    return true; // Return true if the user was deleted
+  }
+  return false; // Return false if the user was not found
+};
+
+// GET route to filter users by name and/or job
 app.get("/users", (req, res) => {
-  const name = req.query.name;
-  if (name != undefined) {
-    let result = users["users_list"].filter((user) => user["name"] === name);
-    result = { users_list: result };
-    res.send(result);
+  const { name, job } = req.query; // Get the query parameters for name and job
+  let result = findUsersByNameAndJob(name, job); // Find users based on the criteria
+  result = { users_list: result }; // Structure the result as users_list
+  res.send(result); // Send the filtered list as the response
+});
+
+// DELETE route to remove a user by ID
+app.delete("/users/:id", (req, res) => {
+  const id = req.params["id"]; // Get the ID from the URL parameter
+  const isDeleted = deleteUserById(id);
+  if (isDeleted) {
+    res.status(200).send("User deleted successfully.");
   } else {
-    res.send(users);
+    res.status(404).send("User not found.");
   }
 });
-
-// GET /users/:id - Return a specific user by ID
-app.get("/users/:id", (req, res) => {
-  const id = req.params.id;  // Capture the 'id' from the URL
-  let result = findUserById(id);  // Find user by ID
-  if (result === undefined) {  // If user not found, send 404
-    res.status(404).send("Resource not found.");
-  } else {
-    res.send(result);  // Send the user data
-  }
-});
-
-// POST /users - Add a new user
-app.post("/users", (req, res) => {
-  const userToAdd = req.body;  // Get the user data from the request body
-  addUser(userToAdd);  // Add the user to the list
-  res.status(201).send();  // Respond with a 201 Created status
-});
-
-// Middleware to parse JSON request bodies
-app.use(express.json());  // This middleware parses incoming JSON data
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(8000, () => {
+  console.log("Server is running on http://localhost:8000");
 });
