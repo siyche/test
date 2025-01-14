@@ -1,50 +1,35 @@
 import express from 'express';
-
 const app = express();
-const PORT = 8000;
+const port = 8000;
 
-// Define the users data structure
+// Sample user data
 const users = {
-    users_list: [
-        {
-            id: "xyz789",
-            name: "Charlie",
-            job: "Janitor"
-        },
-        {
-            id: "abc123",
-            name: "Mac",
-            job: "Bouncer"
-        },
-        {
-            id: "ppp222",
-            name: "Mac",
-            job: "Professor"
-        },
-        {
-            id: "yat999",
-            name: "Dee",
-            job: "Aspiring actress"
-        },
-        {
-            id: "zap555",
-            name: "Dennis",
-            job: "Bartender"
-        }
-    ]
+  users_list: [
+    { id: "xyz789", name: "Charlie", job: "Janitor" },
+    { id: "abc123", name: "Mac", job: "Bouncer" },
+    { id: "ppp222", name: "Mac", job: "Professor" },
+    { id: "yat999", name: "Dee", job: "Aspiring actress" },
+    { id: "zap555", name: "Dennis", job: "Bartender" }
+  ]
 };
 
-// Define the root route
-app.get('/', (req, res) => {
-    res.send('Hello World');
+// Helper function to find users by name
+const findUserByName = (name) => {
+  return users["users_list"].filter(user => user["name"] === name);
+};
+
+// GET route for /users
+app.get("/users", (req, res) => {
+  const name = req.query.name;  // Get the query parameter "name" from the URL
+  if (name != undefined) {
+    let result = findUserByName(name);  // Find users by the specified name
+    result = { users_list: result };  // Wrap the result in the "users_list" object
+    res.send(result);  // Send the filtered users as the response
+  } else {
+    res.send(users);  // If no name is provided, send all users
+  }
 });
 
-// Define the /users route to return the list of users
-app.get('/users', (req, res) => {
-    res.send(users); // Sends the entire users object
-});
-
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });
