@@ -4,6 +4,7 @@ function TableHeader() {
   return (
     <thead>
       <tr>
+        <th>ID</th> {/* Added column for ID */}
         <th>Name</th>
         <th>Job</th>
         <th>Actions</th> {/* Added column for the Delete button */}
@@ -16,7 +17,8 @@ function TableBody(props) {
   // Mapping over characterData and creating rows with a Delete button
   const rows = props.characterData.map((row, index) => {
     return (
-      <tr key={index}>
+      <tr key={row.id}> {/* Using row.id as the key */}
+        <td>{row.id}</td> {/* Display the ID */}
         <td>{row.name}</td>
         <td>{row.job}</td>
         <td>
