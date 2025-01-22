@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cd packages/react-frontend && npm run dev"
+    "dev": "cd packages/react-frontend && npm run dev",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
